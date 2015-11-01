@@ -36,7 +36,7 @@ angular
             }
 
             function refresh() {
-                $timeout(generateList, 2000);
+                $timeout(generateList, 500);
             }
 
             generateList();

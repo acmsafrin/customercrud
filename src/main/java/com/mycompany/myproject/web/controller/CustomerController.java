@@ -4,8 +4,6 @@ import com.mycompany.myproject.persist.entity.Customer;
 import java.util.List;
 
 import org.dozer.DozerBeanMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
@@ -21,8 +19,6 @@ import com.mycompany.myproject.service.dto.CustomerDto;
 @Scope("request")
 public class CustomerController {
 
-    private static final Logger logger = LoggerFactory.getLogger(CustomerController.class);
-
     @Autowired
     private DozerBeanMapper mapper;
 
@@ -34,8 +30,7 @@ public class CustomerController {
 
     @RequestMapping(value = "/customer", method = RequestMethod.GET)
     public @ResponseBody
-    List<CustomerDto> getCustomers() {
-        logger.debug("get json user list");
+    List<CustomerDto> getCustomers() {      
         return customerService.findAll();
     }
 
