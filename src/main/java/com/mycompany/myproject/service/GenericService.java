@@ -10,5 +10,7 @@ public interface GenericService <T, D, ID extends Serializable>{
     List<D> findAll();
     
     T save(D dto);
+    
+   void delete(D dto);
 
 }

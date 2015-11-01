@@ -17,10 +17,6 @@ public class CustomerDto {
     @Mapping("department")
     private Department department;
 
-    @Mapping("retired")
-    private boolean retired;
-    
-    
     
     public Long getId() {
         return id;
@@ -54,14 +50,7 @@ public class CustomerDto {
         this.department = department;
     }
 
-    public boolean isRetired() {
-        return retired;
-    }
-
-    public void setRetired(boolean retired) {
-        this.retired = retired;
-    }
-    
+  
     
 
 }

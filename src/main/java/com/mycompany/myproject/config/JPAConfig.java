@@ -1,9 +1,12 @@
 package com.mycompany.myproject.config;
 
+import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.dozer.DozerBeanMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -16,16 +19,19 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @ComponentScan("com.mycompany.myproject.persist")
 @EnableJpaRepositories("com.mycompany.myproject.persist")
+@PropertySource("/WEB-INF/app.properties")
 public class JPAConfig {
 
-    String driverClassName = "com.mysql.jdbc.Driver";
-    String url = "jdbc:mysql://localhost:3306/customercrud";
-    String username = "root";
-    String password = "";
+    @Autowired
+    Environment env;
 
     @Bean(name = "dataSource")
     public DataSource dataSource() {
-        DriverManagerDataSource driverManagerDataSource=new DriverManagerDataSource(driverClassName);
+        String driverClassName = env.getProperty("driver.class.name");
+        String url = env.getProperty("db.url");
+        String username = env.getProperty("db.username");
+        String password = env.getProperty("db.password");
+        DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource(driverClassName);
         driverManagerDataSource.setDriverClassName(driverClassName);
         driverManagerDataSource.setUrl(url);
         driverManagerDataSource.setUsername(username);
@@ -40,7 +46,7 @@ public class JPAConfig {
         factoryBean.setPackagesToScan(new String[]{"com.mycompany.myproject.persist"});
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setShowSql(true);
-        vendorAdapter.setGenerateDdl(true);        
+        vendorAdapter.setGenerateDdl(true);
         factoryBean.setJpaVendorAdapter(vendorAdapter);
         return factoryBean;
     }

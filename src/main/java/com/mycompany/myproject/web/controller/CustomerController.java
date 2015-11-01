@@ -55,9 +55,8 @@ public class CustomerController {
 
     @RequestMapping(value = "/customer", method = RequestMethod.DELETE)
     @ResponseBody
-    public Customer deleteCustomer(CustomerDto customerDto) {
-        customerDto.setRetired(true);
-        Customer customer= customerService.save(customerDto);
-        return customer;
+    public String deleteCustomer(CustomerDto customerDto) {
+        customerService.delete(customerDto);
+        return "";
     }
 }

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -13,6 +14,7 @@ import javax.persistence.criteria.Predicate;
 import org.dozer.DozerBeanMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 public class GenericServiceImpl<T, D, ID extends Serializable> implements GenericService<T, D, ID> {
 
@@ -42,23 +44,24 @@ public class GenericServiceImpl<T, D, ID extends Serializable> implements Generi
 
     public List<D> findAll() {
         List<D> result = new ArrayList<D>();
-        javax.persistence.criteria.CriteriaBuilder cb = em.getCriteriaBuilder();
-        javax.persistence.criteria.CriteriaQuery<T> cq = cb.createQuery(entityClass);
-        javax.persistence.criteria.Root<T> rt = cq.from(entityClass);
-        ParameterExpression<String> p = cb.parameter(String.class);
-        Predicate predicateRetired = cb.equal(rt.<Boolean>get("retired"), false);
-        cq.where(predicateRetired);
-        for (T t : em.createQuery(cq).getResultList()) {
+        for (T t : repository.findAll()) {
             result.add(mapper.map(t, dtoClass));
         }
         return result;
     }
 
-    public T save(D dto) {        
-      return repository.saveAndFlush(mapper.map(dto, entityClass));
-      
+    
+    public T save(D dto) {
+        return repository.saveAndFlush(mapper.map(dto, entityClass));
+
     }
-    
-    
+
+    @Override
+    @Transactional
+    public void delete(D dto) {
+        T newEntity = em.merge(mapper.map(dto, entityClass));
+        em.remove(newEntity);
+        em.flush();
+    }
 
 }

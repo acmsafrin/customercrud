@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Nov 01, 2015 at 11:55 AM
+-- Generation Time: Nov 01, 2015 at 04:41 PM
 -- Server version: 5.5.20
 -- PHP Version: 5.3.10
 
@@ -31,7 +31,6 @@ CREATE TABLE IF NOT EXISTS `customer` (
   `department` varchar(255) DEFAULT NULL,
   `mobile` varchar(255) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
-  `retired` bit(1) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -39,24 +38,20 @@ CREATE TABLE IF NOT EXISTS `customer` (
 -- Dumping data for table `customer`
 --
 
-INSERT INTO `customer` (`id`, `department`, `mobile`, `name`, `retired`) VALUES
-(1, 'Promotions', 'aa', 'aaa', b'1'),
-(2, 'Administration', '1111', 'Safrin', b'1'),
-(3, 'Administration', '71', 'safr', b'1'),
-(4, 'Administration', '12111', 'Tse333', b'1'),
-(5, 'Administration', '1', 'saa', b'1'),
-(6, 'Promotions', '23', 'ddd', b'1'),
-(7, 'Administration', '4', '33543', b'1'),
-(8, 'Promotions', '379', 'safri', b'0'),
-(9, 'Administration', '32', 'sfdfq', b'0'),
-(10, 'Sales', '5454', 'saff', b'0'),
-(11, 'Administration', 'dddd555', 'dd', b'0'),
-(12, 'Promotions', '2321111', 'sas', b'0'),
-(13, 'Administration', 'dddr541', 'ddd', b'0'),
-(14, 'Administration', 'ss', 'ss', b'0'),
-(15, 'Administration', 'dsds', 'dsf', b'0'),
-(16, 'Sales', 'asa', 'sas', b'0'),
-(100, 'Promotions', '1111', '1sas', b'0');
+INSERT INTO `customer` (`id`, `department`, `mobile`, `name`) VALUES
+(5, 'Administration', '1', 'saa'),
+(6, 'Promotions', '23', 'ddd'),
+(7, 'Administration', '4', '33543'),
+(8, 'Promotions', '379', 'safri'),
+(9, 'Administration', '32', 'sfdfq'),
+(10, 'Engineering', '5454', 'saff'),
+(11, 'Administration', 'dddd555', 'dd'),
+(12, 'Promotions', '2321111', 'sas'),
+(13, 'Administration', 'dddr541', 'ddd'),
+(14, 'Administration', 'ss', 'ss'),
+(15, 'Administration', 'dsds', 'dsf'),
+(16, 'Sales', 'asa', 'sas'),
+(100, 'Promotions', '1111', '1sas');
 
 --
 -- Triggers `customer`
@@ -76,18 +71,22 @@ DROP TRIGGER IF EXISTS `update_log`;
 DELIMITER //
 CREATE TRIGGER `update_log` AFTER UPDATE ON `customer`
  FOR EACH ROW BEGIN  
-IF (NEW.retired= OLD.retired) THEN
         INSERT INTO log 
             (`customerid`,`type` , `date`) 
         VALUES 
-            (NEW.id,'updated', NOW());   
-END IF;
-IF (NEW.retired!= OLD.retired) THEN
+            (NEW.id,'updated', NOW());  
+END
+//
+DELIMITER ;
+DROP TRIGGER IF EXISTS `delete_log`;
+DELIMITER //
+CREATE TRIGGER `delete_log` AFTER DELETE ON `customer`
+ FOR EACH ROW BEGIN  
         INSERT INTO log 
             (`customerid`,`type` , `date`) 
         VALUES 
-            (NEW.id,'deleted', NOW());   
-END IF;
+            (OLD.id,'deleted', NOW());   
+
 END
 //
 DELIMITER ;
@@ -104,14 +103,20 @@ CREATE TABLE IF NOT EXISTS `log` (
   `customerid` varchar(255) NOT NULL,
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=12 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
 
 --
 -- Dumping data for table `log`
 --
 
 INSERT INTO `log` (`id`, `type`, `customerid`, `date`) VALUES
-(11, 'deleted', '7', '2015-11-01 17:24:46');
+(11, 'deleted', '7', '2015-11-01 17:24:46'),
+(12, 'deleted', '100', '2015-11-01 17:56:21'),
+(13, 'deleted', '16', '2015-11-01 17:56:24'),
+(14, 'updated', '10', '2015-11-01 17:56:46'),
+(15, 'updated', '3', '2015-11-01 21:48:55'),
+(16, 'updated', '3', '2015-11-01 21:49:08'),
+(17, 'updated', '4', '2015-11-01 21:50:44');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
