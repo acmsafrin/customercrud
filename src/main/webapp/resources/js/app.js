@@ -1,52 +1,56 @@
 angular
         .module('myApp', ['ngResource'])
-        .service('CustomerService', function($log, $resource) {
+        .service('CustomerRestService', function($resource) {
             return {
                 getAll: function() {
-                    var userResource = $resource('api/customer', {}, {
-                        query: {method: 'GET', params: {}, isArray: true}
+                    var customerResource = $resource('api/customer', {}, {
+                        execute: {method: 'GET', params: {}, isArray: true}
                     });
-                    return userResource.query();
+                    return customerResource;
                 },
                 save: function(customer) {
-                    var userResource = $resource('api/customer', customer, {
-                        save: {method: 'POST'}
+                    var customerResource = $resource('api/customer', customer, {
+                        execute: {method: 'POST'}
                     });
-                    return userResource.save();
+                    return customerResource;
                 },
                 update: function(customer) {
-                    var userResource = $resource('api/customer', customer, {
-                        update: {method: 'PUT'}
+                    var customerResource = $resource('api/customer', customer, {
+                        execute: {method: 'PUT'}
                     });
-                    return userResource.update();
+                    return customerResource;
                 },
                 remove: function(customer) {
-                    var userResource = $resource('api/customer', customer, {
-                        delete: {method: 'DELETE'}
+                    var customerResource = $resource('api/customer', customer, {
+                        execute: {method: 'DELETE'}
                     });
-                    return userResource.delete();
+                    return customerResource;
                 },
             }
         })
-        .controller('CustomerController', function($scope, CustomerService, $timeout) {
-            function generateList() {
-                console.log('Calling Get List');
-                $scope.customers = CustomerService.getAll();
+        .controller('CustomerController', function($scope, CustomerRestService) {
+
+
+            $scope.fetchCustomerList = function() {
+                CustomerRestService.getAll().execute().$promise.then(function(response) {
+                    $scope.customers = response;
+                    $scope.resetCurrentCustomer();
+                });
+            }
+
+            $scope.resetCurrentCustomer = function() {
                 $scope.currentcustomer = '';
             }
 
-            function refresh() {
-                $timeout(generateList, 500);
-            }
-
-            generateList();
-
             $scope.isNewCustomer = function(customer) {
-                if (customer == '') {
-                    return true;
+                try {
+                    if (customer !== '' && customer.id > 0) {
+                        return false;
+                    }
+                } catch (e) {
                 }
 
-                return false;
+                return true;
             }
 
             $scope.setModel = function(customer) {
@@ -54,23 +58,24 @@ angular
             }
 
             $scope.remove = function(customer) {
-                customer.retired = true;
-                var returns = CustomerService.remove(customer);
-                returns.$promise.then(refresh());
+                CustomerRestService.remove(customer).execute().$promise.then(function() {
+                    $scope.fetchCustomerList();
+                });
             }
 
             $scope.submitForm = function(customer) {
-                var returns = "";
+                if ($scope.isNewCustomer(customer)) {
+                    CustomerRestService.save(customer).execute().$promise.then(function() {
+                        $scope.fetchCustomerList();
+                    });
+                } else {
 
-                if($scope.isNewCustomer(customer)){
-                    returns = CustomerService.save(customer);
-                }else{
-                    returns = CustomerService.update(customer);
+                    CustomerRestService.update(customer).execute().$promise.then(function() {
+                        $scope.fetchCustomerList();
+                    });
                 }
-                
-                returns.$promise.then(refresh());
             }
 
-
+            $scope.fetchCustomerList();
 
         });

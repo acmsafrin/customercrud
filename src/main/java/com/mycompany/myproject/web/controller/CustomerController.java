@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.mycompany.myproject.service.CustomerService;
 import com.mycompany.myproject.service.dto.CustomerDto;
+import org.springframework.http.HttpRequest;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 @Scope("request")
@@ -30,8 +32,16 @@ public class CustomerController {
 
     @RequestMapping(value = "/customer", method = RequestMethod.GET)
     public @ResponseBody
-    List<CustomerDto> getCustomers() {      
-        return customerService.findAll();
+    List<CustomerDto> getCustomers() {
+        List<CustomerDto> list = customerService.findAll();
+        return list;
+    }
+
+    @RequestMapping(value = "/customer/{id}", method = RequestMethod.GET)
+    public @ResponseBody
+    CustomerDto getCustomer(@PathVariable Long id) {
+        CustomerDto dto = customerService.findOne(id);
+        return dto;
     }
 
     @RequestMapping(value = "/customer", method = RequestMethod.POST)
